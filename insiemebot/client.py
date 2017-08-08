@@ -48,7 +48,7 @@ async def print_fk_periodic():
         now = utcnow.astimezone(pytz.timezone('Europe/Vienna'))
 
         if now.minute == 0 and now.hour == 11 and now.weekday() < 5:
-            logger.info("GONG")
+            logging.info("GONG")
             await print_fk(client.get_channel(DEFAULT_CHANNEL))
 
         await asyncio.sleep(60)

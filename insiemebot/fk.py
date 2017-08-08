@@ -12,12 +12,12 @@ MENU_URL = 'http://www.cafe-froschkoenig.at/wp-content/uploads/pdf/froschkoenig_
 
 def get_menu():
 
-    logger.info("Getting FK Menu PDF")
+    logging.info("Getting FK Menu PDF")
     r = requests.get(MENU_URL)
     pdf = io.BytesIO()
     pdf.write(r.content)
 
-    logger.info("Extracting Text")
+    logging.info("Extracting Text")
     reader = PdfFileReader(pdf)
     page = reader.getPage(0)
 

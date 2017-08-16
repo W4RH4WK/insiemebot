@@ -1,5 +1,6 @@
 PyPDF2
+beautifulsoup4
 discord.py
 pytz
 pyxdg
-beautifulsoup4
+requests

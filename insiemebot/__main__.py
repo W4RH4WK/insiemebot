@@ -5,7 +5,7 @@ import logging
 
 from datetime import datetime
 from insiemebot.config import Config
-from insiemebot.fk import today
+from insiemebot.fk import today, this_week
 
 
 client = discord.Client()
@@ -25,8 +25,11 @@ async def on_ready():
 @client.event
 async def on_message(message):
     if message.content == '!fk':
-        logging.info("received !fK")
+        logging.info("received !fk")
         await print_fk(message.channel)
+    if message.content == '!fkw':
+        logging.info("received !fkw")
+        await print_fkw(message.channel)
 
 
 async def print_fk(channel):
@@ -38,6 +41,14 @@ async def print_fk(channel):
 
     await client.send_message(channel, msg)
 
+async def print_fkw(channel):
+    try:
+        msg = "**Froschkönig Menü**\n{}".format(this_week())
+    except Exception as e:
+        logging.exception("print_fkw")
+        msg = "Error: {}: {}".format(type(e).__name__, e)
+
+    await client.send_message(channel, msg)
 
 async def print_fk_periodic():
     while True:

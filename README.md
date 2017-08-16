@@ -1,4 +1,5 @@
 # Insieme Discord Bot
 
-- Prints Froschkönig Menu on `!fk`
+- Prints Froschkönig Menu for today on `!fk`
+- Prints Froschkönig Menu for this week on `!fkw`
 - Prints Froschkönig Menu on workdays at 11:00

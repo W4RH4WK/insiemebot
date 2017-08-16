@@ -10,8 +10,10 @@ from datetime import datetime, date
 MENU_URL = 'http://www.cafe-froschkoenig.at/wp-content/uploads/pdf/froschkoenig_woche.pdf'
 
 
-def get_menu():
+def get_weekdays():
+    return ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
 
+def get_menu():
     logging.info("Getting FK Menu PDF")
     r = requests.get(MENU_URL)
     pdf = io.BytesIO()
@@ -22,7 +24,8 @@ def get_menu():
     page = reader.getPage(0)
 
     week = page.extractText()
-    week = re.split('Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag', week)[1:]
+    day_re = "|".join(get_weekdays())
+    week = re.split(day_re, week)[1:]
     return [clean_day(x) for x in week]
 
 
@@ -39,3 +42,6 @@ def clean_day(day):
 def today():
     w = date.weekday(datetime.now())
     return get_menu()[w]
+
+def this_week():
+    return "\n ".join(["__{}__\n{}".format(d, m) for d, m in zip(get_weekdays(), get_menu())])

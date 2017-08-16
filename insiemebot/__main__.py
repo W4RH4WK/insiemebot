@@ -5,7 +5,8 @@ import logging
 
 from datetime import datetime
 from insiemebot.config import Config
-from insiemebot.fk import today, this_week
+from insiemebot.fk import today as fk_today, this_week as fk_this_week
+from insiemebot.unicafe import today as unicafe_today
 
 
 client = discord.Client()
@@ -24,6 +25,9 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    if message.content == '!unicafe':
+        logging.info("received !unicafe")
+        await print_unicafe(message.channel)
     if message.content == '!fk':
         logging.info("received !fk")
         await print_fk(message.channel)
@@ -31,10 +35,18 @@ async def on_message(message):
         logging.info("received !fkw")
         await print_fkw(message.channel)
 
+async def print_unicafe(channel):
+    try:
+        msg = "**Unicafe Tagesmenü**\n{}".format(unicafe_today())
+    except Exception as e:
+        logging.exception("print_unicafe")
+        msg = "Error: {}: {}".format(type(e).__name__, e)
+
+    await client.send_message(channel, msg)
 
 async def print_fk(channel):
     try:
-        msg = "**Froschkönig Menü**\n{}".format(today())
+        msg = "**Froschkönig Menü**\n{}".format(fk_today())
     except Exception as e:
         logging.exception("print_fk")
         msg = "Error: {}: {}".format(type(e).__name__, e)
@@ -43,7 +55,7 @@ async def print_fk(channel):
 
 async def print_fkw(channel):
     try:
-        msg = "**Froschkönig Menü**\n{}".format(this_week())
+        msg = "**Froschkönig Menü**\n{}".format(fk_this_week())
     except Exception as e:
         logging.exception("print_fkw")
         msg = "Error: {}: {}".format(type(e).__name__, e)

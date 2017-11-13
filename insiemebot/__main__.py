@@ -27,14 +27,14 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if message.content == '!unicafe':
-        logging.info("received !unicafe")
+    if message.content == 'unicafe?':
+        logging.info("received unicafe?")
         await print_unicafe(message.channel)
-    if message.content == '!fk':
-        logging.info("received !fk")
+    if message.content == 'fk?':
+        logging.info("received fk?")
         await print_fk(message.channel)
-    if message.content == '!fkw':
-        logging.info("received !fkw")
+    if message.content == 'fkw?':
+        logging.info("received fkw?")
         await print_fkw(message.channel)
 
 async def print_unicafe(channel):

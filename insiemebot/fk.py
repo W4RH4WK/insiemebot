@@ -43,7 +43,3 @@ def clean_day(day):
 def today():
     w = date.weekday(datetime.now())
     return get_menu()[w]
-
-
-def this_week():
-    return "\n ".join(["__{}__\n{}".format(d, m) for d, m in zip(get_weekdays(), get_menu())])

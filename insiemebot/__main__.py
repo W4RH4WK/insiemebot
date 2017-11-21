@@ -38,6 +38,7 @@ async def on_message(message):
         logging.info("received fkw?")
         await print_fkw(message.channel)
 
+
 async def print_unicafe(channel):
     try:
         msg = "**Unicafe Tagesmenü**\n{}".format(unicafe.today())
@@ -46,6 +47,7 @@ async def print_unicafe(channel):
         msg = "Error: {}: {}".format(type(e).__name__, e)
 
     await client.send_message(channel, msg)
+
 
 async def print_fk(channel):
     try:
@@ -56,14 +58,20 @@ async def print_fk(channel):
 
     await client.send_message(channel, msg)
 
+
 async def print_fkw(channel):
     try:
-        msg = "**Froschkönig Menü**\n{}".format(fk.this_week())
+        menu = fk.get_menu()
     except Exception as e:
         logging.exception("print_fkw")
         msg = "Error: {}: {}".format(type(e).__name__, e)
+        await client.send_message(channel, msg)
+    else:
+        await client.send_message(channel, "**Froschkönig Menü**")
+        for (i,m) in enumerate(menu):
+            msg = "{}\n{}".format(fk.get_weekdays()[i], m)
+            await client.send_message(channel, msg)
 
-    await client.send_message(channel, msg)
 
 async def print_fk_periodic():
     while True:

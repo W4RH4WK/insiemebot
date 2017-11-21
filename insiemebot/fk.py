@@ -13,6 +13,7 @@ MENU_URL = 'http://www.cafe-froschkoenig.at/wp-content/uploads/pdf/froschkoenig_
 def get_weekdays():
     return ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
 
+
 def get_menu():
     logging.info("Getting FK Menu PDF")
     r = requests.get(MENU_URL)
@@ -42,6 +43,7 @@ def clean_day(day):
 def today():
     w = date.weekday(datetime.now())
     return get_menu()[w]
+
 
 def this_week():
     return "\n ".join(["__{}__\n{}".format(d, m) for d, m in zip(get_weekdays(), get_menu())])

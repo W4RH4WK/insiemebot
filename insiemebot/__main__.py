@@ -17,6 +17,7 @@ cfg = Config()
 
 @client.event
 async def on_ready():
+    logging.getLogger().setLevel(logging.INFO)
     print("Logged in as {}".format(client.user.name))
     print("- - - - - - - - - - - - - - -")
     for server in client.servers:

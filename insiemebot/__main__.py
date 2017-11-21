@@ -31,10 +31,10 @@ async def on_message(message):
     if message.content == 'unicafe?':
         logging.info("received unicafe?")
         await print_unicafe(message.channel)
-    if message.content == 'fk?':
+    elif message.content == 'fk?':
         logging.info("received fk?")
         await print_fk(message.channel)
-    if message.content == 'fkw?':
+    elif message.content == 'fkw?':
         logging.info("received fkw?")
         await print_fkw(message.channel)
 

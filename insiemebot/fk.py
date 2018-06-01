@@ -25,14 +25,19 @@ def get_menu():
     page = reader.getPage(0)
 
     week = page.extractText()
+    week = clean_week(week)
     day_re = "|".join(get_weekdays())
     week = re.split(day_re, week)[1:]
     return [clean_day(x) for x in week]
 
 
+def clean_week(week):
+    week = re.sub("^[A-Z ]*$", "", week, flags=re.M)
+    week = week.replace("\n", "")
+    return week
+
+
 def clean_day(day):
-    day = re.sub("^[A-Z ]*$", "", day, flags=re.M)
-    day = day.replace("\n", "")
     day = day.replace("Ł", "\n- ")
     day = day.replace("—", "")
     day = re.sub("  +", " ", day)

@@ -38,6 +38,7 @@ def clean_week(week):
 
 
 def clean_day(day):
+    day = day.replace("   ", "\n- ")
     day = day.replace("Ł", "\n- ")
     day = day.replace("—", "")
     day = re.sub("  +", " ", day)

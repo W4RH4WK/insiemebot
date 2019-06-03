@@ -14,7 +14,7 @@ def get_weekdays():
     return ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
 
 
-def get_menu():
+def get_pdf_text():
     logging.info("Getting FK Menu PDF")
     r = requests.get(MENU_URL)
     pdf = io.BytesIO()
@@ -24,7 +24,11 @@ def get_menu():
     reader = PdfFileReader(pdf)
     page = reader.getPage(0)
 
-    week = page.extractText()
+    return page.extractText()
+
+
+def get_menu():
+    week = get_pdf_text()
     week = clean_week(week)
     day_re = "|".join(get_weekdays())
     week = re.split(day_re, week)[1:]
@@ -38,11 +42,12 @@ def clean_week(week):
 
 
 def clean_day(day):
+    day = day.strip()
+    day = re.sub("0([A-Z])", "0\n- \\1", day)
     day = day.replace("   ", "\n- ")
     day = day.replace("Ł", "\n- ")
     day = day.replace("—", "")
     day = re.sub("  +", " ", day)
-    day = day.strip()
     return day
 
 

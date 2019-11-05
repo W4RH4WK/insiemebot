@@ -20,9 +20,9 @@ async def on_ready():
     logging.getLogger().setLevel(logging.INFO)
     print("Logged in as {}".format(client.user.name))
     print("- - - - - - - - - - - - - - -")
-    for server in client.servers:
-        print("{} - {}".format(server.name, server.id))
-        for channel in server.channels:
+    for guild in client.guilds:
+        print("{} - {}".format(guild.name, guild.id))
+        for channel in guild.channels:
             print("\t{} - {}".format(channel.name, channel.id))
 
 
@@ -46,7 +46,7 @@ async def print_unicafe(channel):
         logging.exception("print_unicafe")
         msg = "Error: {}: {}".format(type(e).__name__, e)
 
-    await client.send_message(channel, msg)
+    await channel.send(msg)
 
 
 async def print_fk(channel):
@@ -56,7 +56,7 @@ async def print_fk(channel):
         logging.exception("print_fk")
         msg = "Error: {}: {}".format(type(e).__name__, e)
 
-    await client.send_message(channel, msg)
+    await channel.send(msg)
 
 
 async def print_fkw(channel):
@@ -65,12 +65,12 @@ async def print_fkw(channel):
     except Exception as e:
         logging.exception("print_fkw")
         msg = "Error: {}: {}".format(type(e).__name__, e)
-        await client.send_message(channel, msg)
+        await channel.send(msg)
     else:
-        await client.send_message(channel, "**Froschkönig Menü**")
+        await channel.send("**Froschkönig Menü**")
         for (i,m) in enumerate(menu):
             msg = "{}\n{}".format(fk.get_weekdays()[i], m)
-            await client.send_message(channel, msg)
+            await channel.send(msg)
 
 
 async def print_fk_periodic():
@@ -80,8 +80,8 @@ async def print_fk_periodic():
 
         if now.minute == 0 and now.hour == 11 and now.weekday() < 5:
             logging.info("GONG")
-            for server in client.servers:
-                await print_fk(server.default_channel)
+            for guild in client.guilds:
+                await print_fk(guild.default_channel)
 
         await asyncio.sleep(60)
 

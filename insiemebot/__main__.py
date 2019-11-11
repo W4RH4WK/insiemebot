@@ -14,10 +14,10 @@ from insiemebot.config import Config
 client = discord.Client()
 cfg = Config()
 
+logging.getLogger().setLevel(logging.INFO)
 
 @client.event
 async def on_ready():
-    logging.getLogger().setLevel(logging.INFO)
     print("Logged in as {}".format(client.user.name))
     print("- - - - - - - - - - - - - - -")
     for guild in client.guilds:
@@ -80,8 +80,9 @@ async def print_fk_periodic():
 
         if now.minute == 0 and now.hour == 11 and now.weekday() < 5:
             logging.info("GONG")
-            for guild in client.guilds:
-                await print_fk(guild.default_channel)
+            channel = client.get_channel(int(cfg['channel']))
+            if channel:
+                await print_fk(channel)
 
         await asyncio.sleep(60)
 

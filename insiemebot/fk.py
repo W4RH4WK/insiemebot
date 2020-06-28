@@ -36,18 +36,17 @@ def get_menu():
 
 
 def clean_week(week):
-    week = re.sub("^[A-Z ]*$", "", week, flags=re.M)
+    #week = re.sub("^[A-Z ]*$", "", week, flags=re.M)
     week = week.replace("\n", "")
     return week
 
 
 def clean_day(day):
     day = day.strip()
-    day = re.sub("0([A-Z])", "0\n- \\1", day)
-    day = day.replace("   ", "\n- ")
     day = day.replace("Ł", "\n- ")
-    day = day.replace("—", "")
-    day = re.sub("  +", " ", day)
+    day = re.sub("[A-Z]{2,}", "", day)
+    day = re.sub(" +", " ", day)
+    #day = day.replace("—", "")
     return day
 
 

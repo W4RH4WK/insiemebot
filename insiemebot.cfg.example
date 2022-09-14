@@ -1,0 +1,4 @@
+[base]
+token = <token>
+channel = <channel for periodic menus>
+guild = <guild for slash commands>

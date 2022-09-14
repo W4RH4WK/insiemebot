@@ -4,91 +4,81 @@ import logging
 import pytz
 
 from datetime import datetime
+from discord import app_commands
+from discord.ext import commands
+from discord.ext import tasks
 
-import insiemebot.fk as fk
-import insiemebot.unicafe as unicafe
-
+from insiemebot import fk
 from insiemebot.config import Config
 
 
-client = discord.Client()
+logging.getLogger().setLevel(logging.INFO)
 cfg = Config()
 
-logging.getLogger().setLevel(logging.INFO)
-
-@client.event
-async def on_ready():
-    print("Logged in as {}".format(client.user.name))
-    print("- - - - - - - - - - - - - - -")
-    for guild in client.guilds:
-        print("{} - {}".format(guild.name, guild.id))
-        for channel in guild.channels:
-            print("\t{} - {}".format(channel.name, channel.id))
+if not cfg['token']:
+    logging.error('No token present in %s', cfg.config_file)
+    sys.exit(1)
 
 
-@client.event
-async def on_message(message):
-    if message.content == 'unicafe?':
-        logging.info("received unicafe?")
-        await print_unicafe(message.channel)
-    elif message.content == 'fk?':
-        logging.info("received fk?")
-        await print_fk(message.channel)
-    elif message.content == 'fkw?':
-        logging.info("received fkw?")
-        await print_fkw(message.channel)
+class Insiemebot(commands.Bot):
+    def __init__(self):
+        intents = discord.Intents.default()
+        intents.message_content = True
+        super().__init__(command_prefix="!", intents=intents)
+
+    async def setup_hook(self):
+        await self.tree.sync(guild=discord.Object(id=cfg['guild']))
+        print("Synced slash commands")
+
+    async def on_ready(self):
+        print("Logged in as {}".format(self.user.name))
+        print("- - - - - - - - - - - - - - -")
+        for guild in self.guilds:
+            print("{} - {}".format(guild.name, guild.id))
+            for channel in guild.channels:
+                print("\t{} - {}".format(channel.name, channel.id))
+
+        fk_periodic.start()
 
 
-async def print_unicafe(channel):
-    try:
-        msg = "**Unicafe Tagesmenü**\n{}".format(unicafe.today())
-    except Exception as e:
-        logging.exception("print_unicafe")
-        msg = "Error: {}: {}".format(type(e).__name__, e)
+bot = Insiemebot()
 
-    await channel.send(msg)
-
-
-async def print_fk(channel):
+@bot.hybrid_command(name='fk', with_app_command=True, description='Display Froschkönig menu of today')
+@app_commands.guilds(discord.Object(id=cfg['guild']))
+async def fk_today(ctx):
     try:
         msg = "**Froschkönig Menü**\n{}".format(fk.today())
     except Exception as e:
         logging.exception("print_fk")
         msg = "Error: {}: {}".format(type(e).__name__, e)
+    await ctx.send(msg)
 
-    await channel.send(msg)
-
-
-async def print_fkw(channel):
+@bot.hybrid_command(name='fkw', with_app_command=True, description='Display Froschkönig menu for the whole week')
+@app_commands.guilds(discord.Object(id=cfg['guild']))
+async def fk_week(ctx):
     try:
         menu = fk.get_menu()
     except Exception as e:
         logging.exception("print_fkw")
         msg = "Error: {}: {}".format(type(e).__name__, e)
-        await channel.send(msg)
+        await ctx.send(msg)
     else:
-        await channel.send("**Froschkönig Menü**")
+        await ctx.send("**Froschkönig Menü**")
         for (i,m) in enumerate(menu):
             msg = "{}\n{}".format(fk.get_weekdays()[i], m)
-            await channel.send(msg)
+            await ctx.send(msg)
 
+@tasks.loop(minutes=1)
+async def fk_periodic():
+    utcnow = datetime.utcnow().replace(tzinfo=pytz.utc)
+    now = utcnow.astimezone(pytz.timezone('Europe/Vienna'))
 
-async def print_fk_periodic():
-    while True:
-        utcnow = datetime.utcnow().replace(tzinfo=pytz.utc)
-        now = utcnow.astimezone(pytz.timezone('Europe/Vienna'))
+    if now.minute == 0 and now.hour == 11 and now.weekday() < 5:
+        logging.info("GONG")
+        channel = bot.get_channel(int(cfg['channel']))
+        if channel:
+            await fk_today(channel)
+        else:
+            logging.error("no such channel")
 
-        if now.minute == 0 and now.hour == 11 and now.weekday() < 5:
-            logging.info("GONG")
-            channel = client.get_channel(int(cfg['channel']))
-            if channel:
-                await print_fk(channel)
-
-        await asyncio.sleep(60)
-
-
-if cfg['token']:
-    client.loop.create_task(print_fk_periodic())
-    client.run(cfg['token'])
-else:
-    logging.error('No token present in %s', cfg.config_file)
+bot.run(cfg['token'])

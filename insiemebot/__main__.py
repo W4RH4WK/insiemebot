@@ -50,11 +50,15 @@ async def print_unicafe(channel):
 
 
 async def print_fk(channel):
-    try:
-        msg = "**Froschkönig Menü**\n{}".format(fk.today())
-    except Exception as e:
-        logging.exception("print_fk")
-        msg = "Error: {}: {}".format(type(e).__name__, e)
+    for i in range(0, 3):
+        try:
+            msg = "**Froschkönig Menü**\n{}".format(fk.today())
+            break
+        except Exception as e:
+            logging.exception("print_fk")
+            msg = "Error: {}: {}".format(type(e).__name__, e)
+            await asyncio.sleep(2)
+            continue
 
     await channel.send(msg)
 
